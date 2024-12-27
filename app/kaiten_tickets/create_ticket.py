@@ -47,12 +47,16 @@ async def attach_files(ticket: createTicket):
         raise HTTPException(status_code=400, detail = f"can't attach files: {e}")
 
 async def create_kaiten_child_ticket(ticket: createTicket):
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            f"{ticket.url}/api/latest/cards/{ticket.ticket_id}/children",
-            headers={"Authorization": f"Bearer {ticket.token}"},
-        )
-
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"{ticket.url}/api/latest/cards/{ticket.ticket_id}/children",
+                headers={"Authorization": f"Bearer {ticket.token}"},
+            )
+            response.raise_for_status()
+    except httpx.RequestError as e:
+        raise HTTPException(status_code=500, detail=f"cant create child ticket: {e}")
+        
 async def process_ticket(config, title, description, files):
     ticket = createTicket(
         url=config["url"],
