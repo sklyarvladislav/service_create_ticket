@@ -6,87 +6,20 @@ import httpx
 import asyncio 
 import json
 import os 
-import tomllib
+from get_config import load_config
+from model_createTicket import createTicket
+from fetch_configuration import fetch_configuration
+from create_kaiten_ticket import create_kaiten_ticket
+from attach_files import attach_files
+from create_kaiten_child_ticket import create_kaiten_child_ticket
 
 
 app = FastAPI()
-
-CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config.toml")
-
-def load_config(file_path: str = CONFIG_PATH):
-    try:
-        with open(file_path, "rb") as f:
-            return tomllib.load(f) 
-    except Exception as e:
-        raise RuntimeError(f"Error loading configuration: {e}")
 
 config_data = load_config()
 config_url = config_data["settings"]["config_url"]
 
 
-class createTicket(BaseModel):
-    url: str = None
-    token: str = None
-    title: str
-    description: str 
-    board_id: int = None
-    files: List[UploadFile]
-    ticket_id: int = None
-
-async def fetch_configuration(url: str):
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url) 
-            response.raise_for_status()
-            data = response.json()
-            return data["kaiten_urls"] 
-    except httpx.RequestError as e:
-        raise HTTPException(status_code = 500, detail = f"Internal server error: {e}")
-
-async def create_kaiten_ticket(ticket: createTicket):
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                f"{ticket.url}/api/latest/cards",
-                headers={"Authorization": f"Bearer {ticket.token}"},
-                json={
-                    "title":ticket.title,
-                    "description":ticket.description,
-                    "board_id":ticket.board_id 
-                }
-            )
-            response.raise_for_status()
-            ticket_id = response.json()["id"]
-
-            return ticket_id
-    except httpx.RequestError as e:
-        raise HTTPException(status_code = 400, detail= f"can't create kaiten ticket: {e}")
-
-async def attach_files(ticket: createTicket):
-    try:
-        async with httpx.AsyncClient() as client:
-            for file in ticket.files:
-                content = await file.read()
-
-                response = await client.post(
-                    f"{ticket.url}/api/latest/cards/{ticket.ticket_id}/files",
-                    headers={"Authorization": f"Bearer {ticket.token}"},
-                    files={"file": (file.filename, content)}
-                )
-                response.raise_for_status() 
-    except httpx.RequestError as e:
-        raise HTTPException(status_code=400, detail = f"can't attach files: {e}")
-
-
-async def create_kaiten_child_ticket(ticket: createTicket):
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            f"{ticket.url}/api/latest/cards/{ticket.ticket_id}/children",
-            headers={"Authorization": f"Bearer {ticket.token}"},
-            json={
-                "parent_id":ticket.ticket_id,
-            }
-        )
 
 @app.post("/api/tickets", summary = "create ticket")
 async def create_ticket(
