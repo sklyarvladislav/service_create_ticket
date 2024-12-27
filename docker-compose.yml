@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi_app
+    ports:
+      - "8080:8000"  
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - .:/app
+      - ./config.toml:/app/config.toml
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload  # Используем 0.0.0.0
