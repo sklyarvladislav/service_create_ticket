@@ -1,6 +1,5 @@
 from fastapi import HTTPException
 import httpx
-import asyncio 
 
 async def fetch_configuration(url: str):
     try:

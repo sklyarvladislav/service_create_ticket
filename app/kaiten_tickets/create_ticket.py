@@ -1,7 +1,6 @@
 from fastapi import HTTPException, UploadFile
 from pydantic import BaseModel
 from typing import List
-import asyncio 
 import httpx
 
 class createTicket(BaseModel):
@@ -53,3 +52,17 @@ async def create_kaiten_child_ticket(ticket: createTicket):
             f"{ticket.url}/api/latest/cards/{ticket.ticket_id}/children",
             headers={"Authorization": f"Bearer {ticket.token}"},
         )
+
+async def process_ticket(config, title, description, files):
+    ticket = createTicket(
+        url=config["url"],
+        token=config["token"],
+        title=title,
+        description=description,
+        files=files,
+        board_id=config["board_id"]
+    )
+    ticket.ticket_id = await create_kaiten_ticket(ticket)
+    await attach_files(ticket)
+    await create_kaiten_child_ticket(ticket)
+    return ticket
