@@ -1,18 +1,10 @@
 from fastapi import HTTPException, UploadFile
-from pydantic import BaseModel
-from typing import List
+from card_schema import CreateCard
 import httpx
 
-class createTicket(BaseModel):
-    url: str = None
-    token: str = None
-    title: str
-    description: str 
-    board_id: int = None
-    files: List[UploadFile]
-    ticket_id: int = None
 
-async def create_kaiten_ticket(ticket: createTicket):
+
+async def create_card(ticket: CreateCard):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
@@ -31,7 +23,7 @@ async def create_kaiten_ticket(ticket: createTicket):
     except httpx.RequestError as e:
         raise HTTPException(status_code = 400, detail= f"can't create kaiten ticket: {e}")
 
-async def attach_files(ticket: createTicket):
+async def attach_files(ticket: CreateCard):
     try:
         async with httpx.AsyncClient() as client:
             for file in ticket.files:
@@ -46,7 +38,7 @@ async def attach_files(ticket: createTicket):
     except httpx.RequestError as e:
         raise HTTPException(status_code=400, detail = f"can't attach files: {e}")
 
-async def create_kaiten_child_ticket(ticket: createTicket):
+async def create_card_children(ticket: CreateCard):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
@@ -57,8 +49,8 @@ async def create_kaiten_child_ticket(ticket: createTicket):
     except httpx.RequestError as e:
         raise HTTPException(status_code=500, detail=f"cant create child ticket: {e}")
         
-async def process_ticket(config, title, description, files):
-    ticket = createTicket(
+async def process_card(config, title, description, files):
+    card = CreateCard(
         url=config["url"],
         token=config["token"],
         title=title,
@@ -66,7 +58,7 @@ async def process_ticket(config, title, description, files):
         files=files,
         board_id=config["board_id"]
     )
-    ticket.ticket_id = await create_kaiten_ticket(ticket)
-    await attach_files(ticket)
-    await create_kaiten_child_ticket(ticket)
-    return ticket
+    ticket.ticket_id = await create_card(card)
+    await attach_files(card)
+    await create_card_children(card)
+    return card

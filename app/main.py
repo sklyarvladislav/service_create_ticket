@@ -7,7 +7,7 @@ from config.get_config import load_config
 from config.fetch_configuration import fetch_configuration
 from kaiten_tickets.create_ticket import createTicket, create_kaiten_ticket, attach_files, create_kaiten_child_ticket, process_ticket
 
-app = FastAPI() #add comment
+app = FastAPI() 
 
 config_data = load_config()
 config_url = config_data["settings"]["config_url"]
