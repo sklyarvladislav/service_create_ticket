@@ -1,8 +1,6 @@
 from fastapi import HTTPException, UploadFile
-from card_schema import CreateCard
+from schemas.schemas import CreateCard
 import httpx
-
-
 
 async def create_card(ticket: CreateCard):
     try:

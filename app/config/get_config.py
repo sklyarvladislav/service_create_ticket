@@ -1,9 +1,12 @@
 import tomllib
 import os
+from dotenv import load_dotenv
 from fastapi import HTTPException
 import httpx
 
-CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config.toml")
+load_dotenv() 
+
+CONFIG_PATH = os.getenv('CONFIG_PATH', os.path.join(os.path.dirname(__file__), "..", "config.toml")) 
 
 def load_config(file_path: str = CONFIG_PATH):
     try:

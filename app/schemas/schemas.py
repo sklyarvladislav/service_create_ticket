@@ -1,7 +1,9 @@
 from pydantic import BaseModel
 from typing import List
+from fastapi import UploadFile
 
 class CreateSpace(BaseModel):
+    title: str 
     space_id: int 
 
 class CreateBoard(BaseModel):

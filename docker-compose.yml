@@ -11,5 +11,5 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
     volumes:
-      - ./app/config/config.toml:/app/config/config.toml  # Монтируем только config.toml
+      - ./config.toml:/config.toml  # Монтируем только config.toml
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload

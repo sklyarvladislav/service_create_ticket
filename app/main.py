@@ -3,15 +3,16 @@ from typing import List
 import uvicorn
 import httpx
 
-from config.get_config import load_config
-from config.fetch_configuration import fetch_configuration
-from kaiten_tickets.create_ticket import createTicket, create_kaiten_ticket, attach_files, create_kaiten_child_ticket, process_ticket
+from config.get_config import load_config, fetch_configuration
+from keycloack.get_access_token import get_access_token
+from tododdler.create_card import create_card, attach_files, create_card_children, process_card
+from schemas.schemas import CreateCard
 
 app = FastAPI() 
 
 config_data = load_config()
 config_url = config_data["settings"]["config_url"]
-
+access_token = get_access_token()
 @app.post("/api/tickets", summary="Create ticket")
 async def create_ticket(
     title: str = Form(...),
@@ -19,7 +20,6 @@ async def create_ticket(
     files: List[UploadFile] = File(...)
 ):
     config = await fetch_configuration(config_url)
-
     try:
         for entry in config:
             if entry["primary"]:
