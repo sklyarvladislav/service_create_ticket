@@ -10,7 +10,7 @@ profile_url = config["profile_url"]
 async def get_access_token():
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.post(
+            response = client.post(
                 config["auth_url"],
                 data = {
                     "grant_type": "client_credentials",

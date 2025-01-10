@@ -3,9 +3,10 @@ from typing import List
 import uvicorn
 import httpx
 
-from config.get_config import load_config, fetch_configuration
+from config.get_config import load_config # , fetch_configuration
 from config.get_access_token import get_access_token
-from tododdler.create_card import create_card, attach_files, create_card_children, process_card
+from proccess.create_card import create_card, attach_files, create_card_children, process_card
+from proccess.create_space import check_space
 from schemas.schemas import CreateCard
 
 
@@ -21,7 +22,10 @@ async def create_ticket(
 ):
     # config = await fetch_configuration(config_url)
     access_token = await get_access_token()
-    return 
+    spaces = await check_space(access_token, config_url)
+
+    return spaces.json()
+    
     try:
         for entry in config:
             if entry["primary"]:
