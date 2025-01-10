@@ -6,7 +6,7 @@ import httpx
 
 load_dotenv() 
 
-CONFIG_PATH = os.getenv('CONFIG_PATH', os.path.join(os.path.dirname(__file__), "..", "config.toml")) 
+CONFIG_PATH = os.getenv('CONFIG_PATH') 
 
 def load_config(file_path: str = CONFIG_PATH):
     try:

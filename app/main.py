@@ -4,22 +4,24 @@ import uvicorn
 import httpx
 
 from config.get_config import load_config, fetch_configuration
-from keycloack.get_access_token import get_access_token
+from config.get_access_token import get_access_token
 from tododdler.create_card import create_card, attach_files, create_card_children, process_card
 from schemas.schemas import CreateCard
+
 
 app = FastAPI() 
 
 config_data = load_config()
 config_url = config_data["settings"]["config_url"]
-access_token = get_access_token()
 @app.post("/api/tickets", summary="Create ticket")
 async def create_ticket(
     title: str = Form(...),
     description: str = Form(...),
     files: List[UploadFile] = File(...)
 ):
-    config = await fetch_configuration(config_url)
+    # config = await fetch_configuration(config_url)
+    access_token = await get_access_token()
+    return 
     try:
         for entry in config:
             if entry["primary"]:
