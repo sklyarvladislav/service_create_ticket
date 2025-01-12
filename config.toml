@@ -1,7 +1,7 @@
 [settings]
-config_url = "https://stage.bytes2b.ru"
+config_url = "https://tododdler.bytes2b.ru"
 fernet_key = "PgKi9XHK7409xmwvhpzZQfuO2yekPQxtjmocjI1e6Fo="
 auth_url = "https://auth.bytes2b.ru/realms/Dev/protocol/openid-connect/token"
 profile_url = "https://auth.bytes2b.ru/realms/Dev/users/profile"
 clientId = "tododdler-user-874c27f7-ff89-4167-894e-32c97e0159f4"
-clientSecret = "gAAAAABngH6uqnVk-4J8HRFqA_8UFX4T-cbreCiqlQ7qg8Om9hjGnUeLFEOHlWKtTd3W9fDR2qlWOIAV477SCuyOXATUSnqUml6y7-hmra5zq0LPGHNDMzc5CgY9mxwuCvL2JZ9CAXH1"
+clientSecret = "gAAAAABng6YmYJKgWTaP2VE7z0YCTAcUEfmolKtbSxZnq-WmaXSEs1IOE0WiC3V1HoOPVNnbTtTZK9wHMbIsAwkMlGInvuhRwo7DTIsrURZCyQ0CxALmWgAZDHfiQi0pZ4sp21I1Gkoh"

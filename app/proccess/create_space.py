@@ -18,4 +18,3 @@ async def check_space(
             return response.json()
     except httpx.RequestError as e:
         raise HTTPException(status_code=400, detail="bad request")
-
