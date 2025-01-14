@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from fastapi import HTTPException
 import httpx
+import json
 
 load_dotenv() 
 
@@ -15,12 +16,11 @@ def load_config(file_path: str = CONFIG_PATH):
     except Exception as e:
         raise RuntimeError(f"Error loading configuration: {e}")
 
-# async def fetch_configuration(url: str):
-#     try:
-#         async with httpx.AsyncClient() as client:
-#             response = await client.get(url) 
-#             response.raise_for_status()
-#             data = response.json()
-#             return data["kaiten_urls"] 
-#     except httpx.RequestError as e:
-#         raise HTTPException(status_code = 500, detail = f"Internal server error: {e}")
+
+async def fetch_configuration():
+    with open('config.json', 'r', encoding='utf-8') as file:
+        data = json.load(file)
+
+        return data['spaces']
+
+        

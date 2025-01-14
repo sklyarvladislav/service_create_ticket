@@ -1,0 +1,16 @@
+{
+    "spaces":[
+        {
+            "id": 64,
+            "title": "sklayrvlad1",
+            "board_id": 155,
+            "primary": true
+        },
+        {
+            "id": 65,
+            "title": "sklyarvlad2",
+            "board_id": 156,
+            "primary": false
+        }
+    ]
+}

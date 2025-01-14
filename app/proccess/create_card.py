@@ -1,62 +1,85 @@
 from fastapi import HTTPException, UploadFile
 from schemas.schemas import CreateCard
 import httpx
+from config.get_config import load_config
 
-async def create_card(ticket: CreateCard):
+config_data = load_config()
+config_url = config_data["settings"]["config_url"]
+
+async def create_card(card: CreateCard, access_token):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{ticket.url}/api/latest/cards",
-                headers={"Authorization": f"Bearer {ticket.token}"},
+                f"{config_url}/api/card",
+                headers={"Authorization": f"api-key {access_token}"},
                 json={
-                    "title":ticket.title,
-                    "description":ticket.description,
-                    "board_id":ticket.board_id 
+                    "board_id":card.board_id,
+                    "title":card.title,
+                    "description":card.description,
+                    "deadline": None, 
+                    "type":"bug"
+                    
                 }
             )
             response.raise_for_status()
-            ticket_id = response.json()["id"]
+            card.card_id = response.json()['id']
+            
+            response = await client.post(
+                f"{config_url}/api/card",
+                headers={"Authorization": f"api-key {access_token}"},
+                json={
+                    "board_id":card.board_id,
+                    "title":card.title,
+                    "description":card.description,
+                    "deadline": None, 
+                    "type":"card"
+                    
+                }
+            )
+            card_child_id = response.json()["id"]
+            card.card_child_id = card_child_id
 
-            return ticket_id
+            return card.card_id
     except httpx.RequestError as e:
-        raise HTTPException(status_code = 400, detail= f"can't create kaiten ticket: {e}")
+        raise HTTPException(status_code = 400, detail= f"failed create tododdler's card: {e}")
 
-async def attach_files(ticket: CreateCard):
+
+async def attach_files(card: CreateCard, access_token):
     try:
         async with httpx.AsyncClient() as client:
             for file in ticket.files:
                 content = await file.read()
 
                 response = await client.post(
-                    f"{ticket.url}/api/latest/cards/{ticket.ticket_id}/files",
-                    headers={"Authorization": f"Bearer {ticket.token}"},
+                    f"{config_url}/api/card/{card.card_id}/attachment",
+                    headers={"Authorization": f"api-key {access_token}"},
                     files={"file": (file.filename, content)}
                 )
                 response.raise_for_status() 
     except httpx.RequestError as e:
         raise HTTPException(status_code=400, detail = f"can't attach files: {e}")
 
-async def create_card_children(ticket: CreateCard):
+async def create_card_children(card: CreateCard, access_token):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{ticket.url}/api/latest/cards/{ticket.ticket_id}/children",
-                headers={"Authorization": f"Bearer {ticket.token}"},
+                f"{config_url}/api/card/{card.card_id}/children",
+                headers={"Authorization": f"api-key {access_token}"},
+                json={"card_id":card.card_child_id}
             )
             response.raise_for_status()
     except httpx.RequestError as e:
         raise HTTPException(status_code=500, detail=f"cant create child ticket: {e}")
         
-async def process_card(config, title, description, files):
+async def process_card(config, title, description, files, access_token):
     card = CreateCard(
-        url=config["url"],
-        token=config["token"],
         title=title,
         description=description,
         files=files,
-        board_id=config["board_id"]
+        board_id=config["board_id"],
     )
-    ticket.ticket_id = await create_card(card)
-    await attach_files(card)
-    await create_card_children(card)
-    return card
+    card.card_id = await create_card(card, access_token)
+    await create_card_children(card, access_token)
+    await attach_files(card, access_token)
+    
+    return card.card_id

@@ -18,7 +18,6 @@ class CreateCard(BaseModel):
     files: List[UploadFile]
     board_id: int = None
     card_id: int = None
-    parent_card_id: int = None
-
+    card_child_id: int = None
 
     
