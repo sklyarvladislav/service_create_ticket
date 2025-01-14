@@ -1,18 +1,9 @@
-from pydantic import BaseModel
+from dataclasses import dataclass
 from typing import List
 from fastapi import UploadFile
 
-class CreateSpace(BaseModel):
-    title: str 
-    space_id: int 
-
-class CreateBoard(BaseModel):
-    title: str 
-    space_id: int 
-    board_id: int
-
-class CreateCard(BaseModel):
-    url: str = None
+@dataclass
+class CreateCard():
     title: str
     description: str 
     files: List[UploadFile]

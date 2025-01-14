@@ -47,7 +47,7 @@ async def create_card(card: CreateCard, access_token):
 async def attach_files(card: CreateCard, access_token):
     try:
         async with httpx.AsyncClient() as client:
-            for file in ticket.files:
+            for file in card.files:
                 content = await file.read()
 
                 response = await client.post(
@@ -82,4 +82,4 @@ async def process_card(config, title, description, files, access_token):
     await create_card_children(card, access_token)
     await attach_files(card, access_token)
     
-    return card.card_id
+    return card
