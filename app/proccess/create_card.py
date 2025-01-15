@@ -1,7 +1,7 @@
 from fastapi import HTTPException, UploadFile
-from schemas.schemas import CreateCard
+from app.schemas.schemas import CreateCard
 import httpx
-from config.get_config import load_config
+from app.config.get_config import load_config
 
 config_data = load_config()
 config_url = config_data["settings"]["config_url"]
