@@ -1,4 +1,4 @@
-from fastapi import HTTPException, UploadFile
+from fastapi import HTTPException
 from app.schemas.schemas import CreateCard
 import httpx
 from app.config.get_config import load_config

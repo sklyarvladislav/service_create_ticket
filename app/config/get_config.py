@@ -1,8 +1,6 @@
 import tomllib
 import os
 from dotenv import load_dotenv
-from fastapi import HTTPException
-import httpx
 import json
 
 load_dotenv() 

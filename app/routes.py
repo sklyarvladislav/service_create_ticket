@@ -1,13 +1,13 @@
-from fastapi import FastAPI, Form, File, UploadFile, HTTPException, APIRouter
+from fastapi import Form, File, UploadFile, HTTPException, APIRouter
 
 from typing import List
-import uvicorn
+
 import httpx
 
 from app.config.get_config import load_config, fetch_configuration
 from app.config.get_access_token import get_access_token
-from app.proccess.create_card import create_card, attach_files, create_card_children, process_card
-from app.schemas.schemas import CreateCard
+from app.proccess.create_card import process_card
+
 
 router = APIRouter()
 
@@ -28,7 +28,7 @@ async def create_ticket(
             if entry["primary"]:
                 primary_ticket = await process_card(entry, title, description, files, access_token)
             else:
-                secondary_ticket = await process_card(entry, "not_primary_sklyarvlad_test", description, files, access_token)
+                await process_card(entry, "not_primary_sklyarvlad_test", description, files, access_token)
     except httpx.RequestError as e:
         raise HTTPException(detail=f"Internal server error: {e}")
 
