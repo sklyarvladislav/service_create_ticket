@@ -1,7 +1,7 @@
 from fastapi import HTTPException 
 from cryptography.fernet import Fernet
 import httpx
-from app.config.get_config import load_config
+from src.config.get_config import load_config
 
 config = load_config()["settings"]
 decoder = Fernet(key=config["fernet_key"])

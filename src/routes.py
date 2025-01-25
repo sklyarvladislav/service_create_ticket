@@ -4,9 +4,9 @@ from typing import List
 
 import httpx
 
-from app.config.get_config import load_config, fetch_configuration
-from app.config.get_access_token import get_access_token
-from app.proccess.create_card import process_card
+from src.config.get_config import load_config, fetch_configuration
+from src.config.get_access_token import get_access_token
+from src.proccess.create_card import process_card
 
 
 router = APIRouter()
