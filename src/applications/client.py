@@ -1,30 +1,12 @@
 from fastapi import UploadFile
 import httpx
-from functools import wraps
 from dataclasses import dataclass
-from typing import List, Callable, Type
+from typing import List
 from adaptix import Retort
 
+from src.presentation.exceptions import handle_exceptions, CustomException
 from src.entities.schemas import TododdlerCardCreate, CreateCard, convert_to_tododdler
 from src.entities.constant import CardType
-
-
-def handle_exceptions(exc: List[Type[Exception]], result_exc: Type[Exception] = None):
-    def decorator(func: Callable):
-        @wraps(func)
-        async def wrapper(*args, **kwargs):
-            try:
-                return await func(*args, **kwargs)
-            except tuple(exc) as e:
-                raise result_exc(f"An error occurred: {str(e)}") from e
-
-        return wrapper
-
-    return decorator
-
-
-class CustomException(Exception):
-    pass
 
 
 retort = Retort()
@@ -42,7 +24,6 @@ class CardCreator:
         response = await self.session.post("/api/card", json=card_data)
         response.raise_for_status()
         card.card_id = response.json()["id"]
-        print("im create the card", type_card)
         return card.card_id
 
     @handle_exceptions(
