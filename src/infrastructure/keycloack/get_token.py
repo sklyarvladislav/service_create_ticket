@@ -1,4 +1,4 @@
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 import httpx
 
 from src.infrastructure.configs import load_config
@@ -8,7 +8,9 @@ config = load_config()
 decoder = Fernet(key=config.fernet_key)
 
 
-@handle_exceptions([httpx.RequestError, httpx.HTTPStatusError], CustomException)
+@handle_exceptions(
+    [httpx.RequestError, httpx.HTTPStatusError, InvalidToken], CustomException
+)
 async def get_access_token() -> str:
     async with httpx.AsyncClient() as client:
         response = await client.post(

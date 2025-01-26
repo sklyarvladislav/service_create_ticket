@@ -26,7 +26,9 @@ class CardCreator:
         card.card_id = response.json()["id"]
         return card.card_id
 
-    @handle_exceptions([httpx.RequestError, httpx.HTTPStatusError], CustomException)
+    @handle_exceptions(
+        [httpx.RequestError, httpx.HTTPStatusError, IOError], CustomException
+    )
     async def attach_files(
         self, card: TododdlerCardCreate, files: List[UploadFile]
     ) -> None:
