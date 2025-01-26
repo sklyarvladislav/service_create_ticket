@@ -1,0 +1,8 @@
+[settings]
+config_url = "https://tododdler.bytes2b.ru"
+
+[secrets]
+clientId = "tododdler-user-874c27f7-ff89-4167-894e-32c97e0159f4"
+clientSecret = "gAAAAABnhnXpStxAUuSeLm9HL2I4SYnC3DerRIhofaQk32Q4JjsrPBE_0GGin5UZuEJw9tyN7GNr3E8P7KOy2u36pzaL0dKVzVJnlkXVWoTzLOCQbguaeQXMwgzjqgORlsHKB4ruFNld"
+fernet_key = "PgKi9XHK7409xmwvhpzZQfuO2yekPQxtjmocjI1e6Fo="
+auth_url = "https://auth.bytes2b.ru/realms/Dev/protocol/openid-connect/token"

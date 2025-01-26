@@ -2,15 +2,15 @@ from fastapi import Form, File, UploadFile, Request, APIRouter
 
 from typing import List
 
-from src.config.get_config import load_config, fetch_configuration
-from src.proccess.create_card import CardCreator
-from src.schemas.schemas import CreateCard
+from src.infrastructure.configs import load_config
+from src.applications.client import CardCreator
+from src.entities.schemas import CreateCard
 
 
 router = APIRouter()
 
-config_data = load_config()
-config_url = config_data["settings"]["config_url"]
+config = load_config()
+config_url = config.url
 
 
 @router.post("/api/tickets", tags=["tickets"])
@@ -21,9 +21,9 @@ async def create_ticket(
     files: List[UploadFile] = File(...),
 ):
     card_creator: CardCreator = request.app.state.card_creator
-    config = await fetch_configuration()
+    config = request.app.state.config
     primary_ticket = None
-    for entry in config:
+    for entry in config.spaces_config.spaces:
         card = CreateCard(
             title=title,
             description=description,

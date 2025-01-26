@@ -1,14 +1,14 @@
-import httpx
 from fastapi import FastAPI
-from src.routes import router
+import httpx
 import uvicorn
-from src.proccess.create_card import CardCreator
-from src.config.get_access_token import get_access_token
-from src.config.get_config import load_config
 
+from src.presentation.routers import router
+from src.applications.client import CardCreator
+from src.infrastructure.keycloack.get_token import get_access_token
+from src.infrastructure.configs import load_config
 
-config_data = load_config()
-config_url = config_data["settings"]["config_url"]
+config = load_config()
+config_url = config.url
 
 
 async def lifespan(app):
@@ -17,6 +17,7 @@ async def lifespan(app):
         base_url=config_url, headers={"Authorization": f"api-key {access_token}"}
     )
     app.state.card_creator = CardCreator(session=client)
+    app.state.config = config
     yield
 
     await client.aclose()

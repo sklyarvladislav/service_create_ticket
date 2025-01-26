@@ -1,23 +1,23 @@
 from fastapi import HTTPException
 from cryptography.fernet import Fernet
 import httpx
-from src.config.get_config import load_config
 
-config = load_config()["settings"]
-decoder = Fernet(key=config["fernet_key"])
-auth_url = config["auth_url"]
+from src.infrastructure.configs import load_config
+
+config = load_config()
+decoder = Fernet(key=config.fernet_key)
 
 
 async def get_access_token() -> str:
     async with httpx.AsyncClient() as client:
         try:
             response = await client.post(
-                config["auth_url"],
+                config.auth_url,
                 data={
                     "grant_type": "client_credentials",
-                    "client_id": config["clientId"],
+                    "client_id": config.client_id,
                     "client_secret": decoder.decrypt(
-                        config["clientSecret"].encode()
+                        config.client_secret.encode()
                     ).decode(),
                 },
             )

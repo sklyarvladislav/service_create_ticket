@@ -1,14 +1,7 @@
-from dataclasses import dataclass
-from typing import List
 from fastapi import UploadFile
-import enum
+from dataclasses import dataclass
 from adaptix.conversion import get_converter
-
-
-@dataclass
-class CardType(str, enum.Enum):
-    BUG = "bug"
-    CARD = "card"
+from typing import List
 
 
 @dataclass
