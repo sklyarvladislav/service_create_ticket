@@ -1,6 +1,6 @@
 from fastapi import Form, File, UploadFile, Request, APIRouter
 
-from typing import List
+from typing import List, Any
 
 from src.infrastructure.configs import load_config
 from src.applications.client import CardCreator
@@ -19,7 +19,7 @@ async def create_ticket(
     title: str = Form(...),
     description: str = Form(...),
     files: List[UploadFile] = File(...),
-):
+) -> dict[str, Any]:
     card_creator: CardCreator = request.app.state.card_creator
     config = request.app.state.config
     primary_ticket = None

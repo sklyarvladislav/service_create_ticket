@@ -20,7 +20,7 @@ class Config(BaseModel):
     spaces_config: SpacesConfig
 
 
-def load_config():
+def load_config() -> Config:
     settings = Dynaconf(
         settings_files=[
             os.environ["CONFIG_PATH"],
