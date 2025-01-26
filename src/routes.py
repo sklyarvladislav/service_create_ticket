@@ -2,7 +2,6 @@ from fastapi import Form, File, UploadFile, Request, APIRouter
 
 from typing import List
 
-import httpx
 from src.config.get_config import load_config, fetch_configuration
 from src.proccess.create_card import CardCreator
 from src.schemas.schemas import CreateCard
@@ -12,6 +11,7 @@ router = APIRouter()
 
 config_data = load_config()
 config_url = config_data["settings"]["config_url"]
+
 
 @router.post("/api/tickets", tags=["tickets"])
 async def create_ticket(

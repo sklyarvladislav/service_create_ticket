@@ -10,16 +10,17 @@ from src.config.get_config import load_config
 config_data = load_config()
 config_url = config_data["settings"]["config_url"]
 
+
 async def lifespan(app):
     access_token = await get_access_token()
     client = httpx.AsyncClient(
-        base_url=config_url,
-        headers={"Authorization": f"api-key {access_token}"}
+        base_url=config_url, headers={"Authorization": f"api-key {access_token}"}
     )
     app.state.card_creator = CardCreator(session=client)
     yield
 
     await client.aclose()
+
 
 app = FastAPI(lifespan=lifespan)
 
