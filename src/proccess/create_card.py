@@ -1,85 +1,66 @@
-from fastapi import HTTPException
-from src.schemas.schemas import CreateCard
+from fastapi import HTTPException, UploadFile
+from src.schemas.schemas import TododdlerCardCreate, CreateCard, CardType
 import httpx
 from src.config.get_config import load_config
+from dataclasses import dataclass
+from src.schemas.schemas import convert_to_tododdler
+from adaptix import Retort
+from typing import List
 
 config_data = load_config()
 config_url = config_data["settings"]["config_url"]
 
-async def create_card(card: CreateCard, access_token):
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                f"{config_url}/api/card",
-                headers={"Authorization": f"api-key {access_token}"},
-                json={
-                    "board_id":card.board_id,
-                    "title":card.title,
-                    "description":card.description,
-                    "deadline": None, 
-                    "type":"bug"
-                    
-                }
+# def handle_exceptions(
+#         exc: list[Exception],
+#         result_exc: Exception
+# ):
+#     pass 
+
+retort = Retort()
+
+@dataclass
+class CardCreator:
+    session: httpx.AsyncClient 
+
+    # @handle_exceptions()
+    async def create_card(self, card: TododdlerCardCreate, type_card: str):
+
+            card_data = retort.dump(card)
+            card_data["type"] = type_card
+            card_data["deadline"] = None
+            
+            response = await self.session.post(
+                f"/api/card",
+                json=card_data
             )
             response.raise_for_status()
             card.card_id = response.json()['id']
-            
-            response = await client.post(
-                f"{config_url}/api/card",
-                headers={"Authorization": f"api-key {access_token}"},
-                json={
-                    "board_id":card.board_id,
-                    "title":card.title,
-                    "description":card.description,
-                    "deadline": None, 
-                    "type":"card"
-                    
-                }
-            )
-            card_child_id = response.json()["id"]
-            card.card_child_id = card_child_id
-
             return card.card_id
-    except httpx.RequestError as e:
-        raise HTTPException(status_code = 400, detail= f"failed create tododdler's card: {e}")
-
-
-async def attach_files(card: CreateCard, access_token):
-    try:
-        async with httpx.AsyncClient() as client:
-            for file in card.files:
+    
+    # @handle_exceptions()
+    async def attach_files(self, card: TododdlerCardCreate, files: List[UploadFile]):
+            for file in files:
                 content = await file.read()
-
-                response = await client.post(
-                    f"{config_url}/api/card/{card.card_id}/attachment",
-                    headers={"Authorization": f"api-key {access_token}"},
+                response = await self.session.post(
+                    f"/api/card/{card.card_id}/attachment",
                     files={"file": (file.filename, content)}
                 )
                 response.raise_for_status() 
-    except httpx.RequestError as e:
-        raise HTTPException(status_code=400, detail = f"can't attach files: {e}")
 
-async def create_card_children(card: CreateCard, access_token):
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                f"{config_url}/api/card/{card.card_id}/children",
-                headers={"Authorization": f"api-key {access_token}"},
-                json={"card_id":card.card_child_id}
-            )
-            response.raise_for_status()
-    except httpx.RequestError as e:
-        raise HTTPException(status_code=500, detail=f"cant create child ticket: {e}")
-        
-async def process_card(config, title, description, files, access_token):
-    card = CreateCard(
-        title=title,
-        description=description,
-        files=files,
-        board_id=config["board_id"],
-    )
-    card.card_id = await create_card(card, access_token)
-    await create_card_children(card, access_token)
-    await attach_files(card, access_token)
+    # @handle_exceptions()
+    async def create_card_children(self, parent_card: TododdlerCardCreate, child_card: TododdlerCardCreate):
+        response = await self.session.post(
+           f"/api/card/{parent_card.card_id}/children",
+           json={"card_id":child_card.card_id}
+        )
+        response.raise_for_status()
     
-    return card
+
+    async def process_card(self, card: TododdlerCardCreate) -> CreateCard:
+        parent_card = convert_to_tododdler(card)
+        child_card = convert_to_tododdler(card)
+        parent_card.card_id = await self.create_card(parent_card, CardType.BUG.value)
+        child_card.card_id = await self.create_card(child_card, CardType.CARD.value)
+        await self.create_card_children(parent_card, child_card)
+        await self.attach_files(parent_card, card.files)
+        return parent_card

@@ -2,6 +2,7 @@ import tomllib
 import os
 from dotenv import load_dotenv
 import json
+from typing import List, Dict
 
 load_dotenv() 
 
@@ -15,7 +16,7 @@ def load_config(file_path: str = CONFIG_PATH):
         raise RuntimeError(f"Error loading configuration: {e}")
 
 
-async def fetch_configuration():
+async def fetch_configuration() -> List[Dict]: 
     with open('config.json', 'r', encoding='utf-8') as file:
         data = json.load(file)
 

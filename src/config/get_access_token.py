@@ -7,7 +7,7 @@ config = load_config()["settings"]
 decoder = Fernet(key=config["fernet_key"])
 auth_url = config["auth_url"]
 
-async def get_access_token():
+async def get_access_token() -> str:
     async with httpx.AsyncClient() as client:
         try:
             response = await client.post(

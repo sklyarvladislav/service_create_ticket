@@ -3,13 +3,13 @@
         {
             "id": 64,
             "title": "sklayrvlad1",
-            "board_id": 155,
+            "board_id": 178,
             "primary": true
         },
         {
             "id": 65,
             "title": "sklyarvlad2",
-            "board_id": 156,
+            "board_id": 179,
             "primary": false
         }
     ]
